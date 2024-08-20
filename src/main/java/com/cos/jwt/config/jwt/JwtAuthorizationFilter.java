@@ -31,14 +31,13 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         this.key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
     }
 
-
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         System.out.println("인증이나 권한이 필요한 주소 요청이 됨");
         String header = request.getHeader(JwtProperties.HEADER_STRING);
         if (header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
+            System.out.println("header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)");
             chain.doFilter(request, response);
             return;
         }
@@ -67,6 +66,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                             principalDetails,
                             null,
                             principalDetails.getAuthorities());
+
             // 강제로 시큐리티의 세션에 접근하여 Authentication 객체를 저장한다.
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

@@ -5,29 +5,26 @@ import java.util.List;
 import com.cos.jwt.config.auth.PrincipalDetails;
 import com.cos.jwt.model.User2;
 import com.cos.jwt.repository.UserRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("api/v1")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
-// @CrossOrigin  // CORS 허용
+//@CrossOrigin(origins = "http://localhost:8080")
 public class RestApiController {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     // 모든 사람이 접근 가능
-    @GetMapping("home")
-    public String home() {
-        return "<h1>home</h1>";
+    @GetMapping("/home")
+    public ResponseEntity<String> home() {
+        return ResponseEntity.ok("home");
     }
 
     // Tip : JWT를 사용하면 UserDetailsService를 호출하지 않기 때문에 @AuthenticationPrincipal 사용 불가능.
@@ -36,6 +33,11 @@ public class RestApiController {
     // 유저 혹은 매니저 혹은 어드민이 접근 가능
     @GetMapping("user")
     public String user(Authentication authentication) {
+        if (authentication == null) {
+            System.out.println("Authentication object is null.");
+            return "<h1>No Authentication</h1>";
+        }
+        System.out.println("USER");
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         System.out.println("principal : "+principal.getUser().getId());
         System.out.println("principal : "+principal.getUser().getUsername());
@@ -61,6 +63,7 @@ public class RestApiController {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setRoles("ROLE_USER");
         userRepository.save(user);
+        System.out.println("회원가입 완료");
         return "회원가입완료";
     }
 

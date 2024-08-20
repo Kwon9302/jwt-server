@@ -59,7 +59,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         System.out.println("JwtAuthenticationFilter: 토큰 생성 완료");
 
         // authenticate() 호출 시 인증 프로세스가 실행됨
+        System.out.println("authenticationManager 실행");
+
+        // 여기서 PrincipalDetailsService의 loadUserByUserName메서드 실행
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        System.out.println("authenticationManager 실행 종료");
 
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         System.out.println("Authentication: " + principalDetails.getUser().getUsername());

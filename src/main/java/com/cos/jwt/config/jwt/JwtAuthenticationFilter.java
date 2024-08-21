@@ -7,7 +7,6 @@ import java.util.Date;
 import com.cos.jwt.config.auth.PrincipalDetails;
 import com.cos.jwt.dto.LoginRequestDto;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -36,7 +35,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
-
         System.out.println("JwtAuthenticationFilter: 진입");
 
         // Request에서 username과 password를 추출
@@ -49,25 +47,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
 
         System.out.println("JwtAuthenticationFilter: " + loginRequestDto);
-
         // UsernamePasswordAuthenticationToken 생성
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(
                         loginRequestDto.getUsername(),
                         loginRequestDto.getPassword());
-
         System.out.println("JwtAuthenticationFilter: 토큰 생성 완료");
 
         // authenticate() 호출 시 인증 프로세스가 실행됨
         System.out.println("authenticationManager 실행");
-
         // 여기서 PrincipalDetailsService의 loadUserByUserName메서드 실행
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         System.out.println("authenticationManager 실행 종료");
-
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        System.out.println("Authentication: " + principalDetails.getUser().getUsername());
-
+        System.out.println("authentication : " + authentication);
         return authentication;
     }
 
@@ -77,9 +69,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             Authentication authResult) throws IOException, ServletException {
 
         PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
-
+        System.out.println("successfulAuthentication: " + principalDetails);
         SecretKey secretKey = Keys.hmacShaKeyFor(JwtProperties.SECRET.getBytes(StandardCharsets.UTF_8));
 
+        // 토큰 생성
         String jwtToken = Jwts.builder()
                 .setSubject(principalDetails.getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
@@ -87,7 +80,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .claim("username", principalDetails.getUser().getUsername())
                 .signWith(secretKey)
                 .compact();
-
         response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken);
     }
 }

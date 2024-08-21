@@ -43,7 +43,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
         System.out.println(header);
 
-        // 정상 사용자인지 확인
+        // Header(Bearer)를 제거 -> JWT토큰만 남김
         String token = header.replace(JwtProperties.TOKEN_PREFIX, "");
 
         // 토큰 검증 및 클레임 추출
@@ -70,7 +70,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             // 강제로 시큐리티의 세션에 접근하여 Authentication 객체를 저장한다.
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-
         chain.doFilter(request, response);
     }
 }

@@ -24,8 +24,6 @@ import lombok.RequiredArgsConstructor;
 
 import javax.crypto.SecretKey;
 
-import static org.springframework.security.config.Elements.JWT;
-
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
